@@ -23,7 +23,7 @@ type Queue struct {
 var Que []string
 
 // // Queues declaration
-// var Qs []*Queue
+var Qs []*Queue
 
 type Repository interface {
 	Read() []*Queue
@@ -46,7 +46,6 @@ func (q *Queue) Read() []*Queue {
 	for scanner.Scan() {
 		if scanner.Text() == "" {
 			queue = append(queue, obj)
-			fmt.Println("OUT", scanner.Text())
 			objcnt++
 			obj = &Queue{}
 			continue
@@ -68,49 +67,23 @@ func (q *Queue) Read() []*Queue {
 		}
 
 		cnt++;
-		fmt.Println("IN", scanner.Text())
 	}
 	
-	prioritizeQueue(queue)
-	
-	fmt.Println("print", queue[0].Domain, queue[1].Priority, queue[2].Weight, queue[3])
+	PrioritizeQueue(queue)
+	Qs = queue
 	return queue;
 }
 
 
-func prioritizeQueue(queue []*Queue) {
+func PrioritizeQueue(queue []*Queue) []*Queue {
 	sort.Slice(queue, func(i, j int) bool {
 		return queue[i].Weight > queue[j].Weight
 	})
 	sort.Slice(queue, func(i, j int) bool {
 		return queue[i].Priority > queue[j].Priority
 	})
+	return queue
 }
-
-// func MockQueue() []*Queue {
-// 	return []*Queue {
-// 		{
-// 			Domain: "alpha",
-// 			Priority: 5,
-// 			Weight: 5,
-// 		},
-// 		{
-// 			Domain: "beta",
-// 			Priority: 1,
-// 			Weight: 5,
-// 		},
-// 		{
-// 			Domain: "alpha",
-// 			Priority: 5,
-// 			Weight: 1,
-// 		},
-// 		{
-// 			Domain: "beta",
-// 			Priority: 3,
-// 			Weight: 5,
-// 		},
-// 	}
-// }
 
 // ProxyMiddleware should queue our incoming requests
 func ProxyMiddleware(c iris.Context) {
@@ -127,6 +100,5 @@ func ProxyMiddleware(c iris.Context) {
 		fmt.Println("FROM SOURCE", row.Domain)
 	}
 	Que = append(Que, domain)
-
 	c.Next()
 }
